@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@fastify/cors": "^11.1.0",
-    "@fastify/rate-limit": "^10.3.0",
+    "@fastify/rate-limit": "^11.2.0",
     "@seeplusplus/analyzer": "workspace:*",
     "@seeplusplus/config": "workspace:*",
     "@seeplusplus/test-fixtures": "workspace:*",
@@ -20,11 +20,11 @@
     "@seeplusplus/tracer-adapters": "workspace:*",
     "fastify": "^5.5.0",
     "pg": "^8.16.3",
-    "zod": "^3.25.76"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/pg": "^8.15.5",
     "tsx": "^4.20.5",
-    "vitest": "^3.2.4"
+    "vitest": "^4.1.11"
   }
 }

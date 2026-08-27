@@ -12,10 +12,10 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "zod": "^3.25.76",
+    "zod": "^4.4.3",
     "zod-to-json-schema": "^3.24.6"
   },
   "devDependencies": {
-    "vitest": "^3.2.4"
+    "vitest": "^4.1.11"
   }
 }

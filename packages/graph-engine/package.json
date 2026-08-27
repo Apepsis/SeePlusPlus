@@ -14,11 +14,11 @@
   "dependencies": {
     "@seeplusplus/memory-model": "workspace:*",
     "@seeplusplus/trace-schema": "workspace:*",
-    "@dagrejs/dagre": "^1.1.5"
+    "@dagrejs/dagre": "^3.1.1"
   },
   "devDependencies": {
     "@seeplusplus/test-fixtures": "workspace:*",
     "@types/dagre": "^0.7.52",
-    "vitest": "^3.2.4"
+    "vitest": "^4.1.11"
   }
 }
