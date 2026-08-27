@@ -1,0 +1,13 @@
+node_modules/
+dist/
+coverage/
+.env
+.DS_Store
+playwright-report/
+test-results/
+*.log
+*.trace.json
+*.tsbuildinfo
+.cache/
+data/
+runner/local/build/

@@ -1,0 +1,30 @@
+{
+  "name": "@seeplusplus/api",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@fastify/cors": "^11.1.0",
+    "@fastify/rate-limit": "^10.3.0",
+    "@seeplusplus/analyzer": "workspace:*",
+    "@seeplusplus/config": "workspace:*",
+    "@seeplusplus/test-fixtures": "workspace:*",
+    "@seeplusplus/trace-normalizer": "workspace:*",
+    "@seeplusplus/trace-schema": "workspace:*",
+    "@seeplusplus/tracer-adapters": "workspace:*",
+    "fastify": "^5.5.0",
+    "pg": "^8.16.3",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.15.5",
+    "tsx": "^4.20.5",
+    "vitest": "^3.2.4"
+  }
+}
