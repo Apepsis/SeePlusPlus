@@ -21,7 +21,7 @@ jobs:
         with: { version: 10.15.0 }
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: pnpm }
-      - uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@v6
       - run: pnpm install --frozen-lockfile
       - name: Build honest static demo
         run: pnpm --filter @seeplusplus/web... build
