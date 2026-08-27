@@ -1,4 +1,4 @@
-FROM gcc:13.3.0-bookworm
+FROM gcc:15.2.0-bookworm
 
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update \
