@@ -1,86 +1,168 @@
-# Adaptive Learning OS
+# SeePlusPlus
 
-A personal **Learning Operating System**: upload study material (PDFs,
-slides, photos of notes), get a searchable, cited knowledge base, a concept
-curriculum extracted from it, lessons/flashcards/a study guide generated
-from that, grounded chat over your sources, and practice questions with
-timing, hints, and error feedback — all from the same domain model.
+**SeePlusPlus** is an interactive C++ execution visualizer for studying what happens inside a program while it runs.
 
-This repository follows the architecture defined in
-[`docs/architecture/blueprint.md`](docs/architecture/blueprint.md): a modular
-monolith backend, a Next.js frontend, Postgres/pgvector as the single source
-of domain truth, and object storage as the source of truth for original
-files.
+It compiles real C++ code with debug information, traces execution through GDB/DWARF, normalizes runtime state into a stable trace format, and renders stack frames, heap objects, pointers, lifetimes, console output, and analyzer findings in an interactive web interface.
 
-> **Current status: MVP complete** (blueprint section 43 — Phases 0-6).
-> Upload → parse/search → concept graph → lessons/flashcards/study guide →
-> grounded chat with citations → practice, end to end. See
-> [`docs/architecture/roadmap.md`](docs/architecture/roadmap.md) for what
-> was built in each phase and what's next (mastery modeling, FSRS, the
-> adaptive planner, olympiad-depth verification, integrations, hardening —
-> a distinct second stage, not started).
+The project is designed as an engineering and educational systems prototype rather than a simulated code-animation demo: runtime state comes from the executed program whenever the active runner is used, and unsupported values are reported as unavailable instead of being guessed.
 
-## Why a static site *and* a full backend in the same repo?
+## What it visualizes
 
-GitHub Pages only serves static files — it cannot run the FastAPI backend,
-PostgreSQL, Redis, or Celery workers this project needs. So this repo ships
-two things:
+- source-code execution step by step;
+- function calls, returns, and recursion;
+- stack frames and local variables;
+- heap allocations created with `new` and released with `delete`;
+- pointer relationships and aliasing;
+- linked structures such as lists and trees;
+- allocation generations and object lifetimes;
+- console input/output;
+- memory-related findings such as leaks, dangling references, and reachability problems;
+- ASan/UBSan terminal failures when available from the runner.
 
-1. **The real application** (`apps/web`, `apps/api`, `docker-compose.yml`) —
-   run it locally with Docker, or deploy it to a host that supports servers
-   (Render, Railway, Fly.io, a VPS, etc.).
-2. **A static landing page** (`site/`) describing the project, deployed to
-   GitHub Pages via [`.github/workflows/pages.yml`](.github/workflows/pages.yml).
-   It's documentation/marketing, not the app itself.
+## How it works
 
-## Quickstart (local, Docker)
+```text
+C++ source
+    |
+    v
+API -> isolated runner container
+          |
+          +-> compile with GCC + DWARF
+          +-> execute under GDB
+          +-> record frames, variables and allocation events
+          |
+          v
+      raw runtime records
+          |
+          v
+normalizer -> ProgramTrace v1 -> analyzer
+          |                    |
+          +---------+----------+
+                    v
+              web visualizer
+     code | stack | heap | graph | console
+```
+
+The browser owns editing, playback, and rendering. The API owns run IDs, quotas, caching, normalization, validation, and persistence. The runner owns compilation and debugger instrumentation and is intentionally separated from database or cloud credentials.
+
+See [`docs/architecture.md`](docs/architecture.md) for the full boundary model and execution sequence.
+
+## Current implementation status
+
+The current baseline includes:
+
+- real C++ compilation and tracing through GDB/DWARF;
+- a versioned `ProgramTrace` schema;
+- stack, heap, console, and playback views;
+- a semantic pointer/object graph;
+- memory analysis for leaks, reachability, dangling objects, and sanitizer failures;
+- tracked `new`/`delete` lifetime visualization;
+- content-addressed trace caching;
+- workspace persistence through in-memory or PostgreSQL adapters;
+- CI checks for type safety, tests, runner behavior, and hostile-code containment;
+- GitHub Pages build support for static demonstration traces.
+
+For the exact implementation matrix and known limitations, see [`docs/IMPLEMENTATION_STATUS.md`](docs/IMPLEMENTATION_STATUS.md).
+
+## Supported C++ subset
+
+Supported today includes, with explicit limits:
+
+- primitive local variables;
+- function calls and returns;
+- recursion;
+- raw pointers and aliasing;
+- fixed arrays;
+- struct/class fields;
+- `new` / `delete`;
+- linked data structures.
+
+References, constructors/destructors, exceptions, standard-library containers, smart pointers, inheritance, templates, and `new[]` / `delete[]` remain experimental. Threads and custom compiler/toolchain configuration are not supported by the current trace model.
+
+See [`docs/supported-cpp.md`](docs/supported-cpp.md) for the evidence-backed support registry.
+
+## Repository structure
+
+```text
+apps/
+  api/                  API, run orchestration, persistence and cache integration
+  web/                  React/Vite execution visualizer
+
+engine/                 trace schema, normalizer, analyzer, graph and memory logic
+runner/                 isolated C++ compiler/debugger runtime
+db/                     persistence and migrations
+examples/               semantic and visualization examples
+infra/                   security policy and deployment blueprints
+docs/                    architecture, validation and implementation notes
+```
+
+## Run locally
+
+### Requirements
+
+- Node.js 22+
+- pnpm / Corepack
+- Docker Desktop or Docker Engine
+- Git
+
+### Install
 
 ```bash
-cp .env.example .env
-make dev
+corepack enable
+pnpm install
 ```
 
-This starts Postgres (with pgvector), Redis, MinIO, the FastAPI API, the
-Celery worker, and the Next.js web app.
-
-- Web: http://localhost:3000
-- API: http://localhost:8000 (docs at `/docs`)
-- API health: http://localhost:8000/health/ready
-- MinIO console: http://localhost:9001
-
-Apply database migrations (first run, and after any schema change):
+Build the isolated C++ runner:
 
 ```bash
-make migrate
+docker build -f runner/local/Dockerfile -t seeplusplus-runner:local .
 ```
 
-Run the test suites:
+Start the development environment:
 
 ```bash
-make test
+pnpm dev
 ```
 
-See [`docs/runbooks/windows-local.md`](docs/runbooks/windows-local.md) for
-Windows/Docker Desktop specific notes.
+Default local endpoints:
 
-## Repository layout
+- Web: `http://localhost:4000`
+- API: `http://localhost:3000`
 
+PostgreSQL is optional for development; without `DATABASE_URL`, the API can use the in-memory workspace repository.
+
+Detailed development notes are in [`docs/development.md`](docs/development.md).
+
+## Validation
+
+Run the main acceptance checks with:
+
+```bash
+pnpm format:check
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+pnpm test:runner
+pnpm test:security
 ```
-apps/web/     Next.js frontend (TypeScript, Tailwind, TanStack Query)
-apps/api/     FastAPI backend (modular monolith) + Celery workers
-infra/        Dockerfiles and deployment infrastructure
-docs/         Architecture, ADRs, runbooks
-site/         Static landing page published to GitHub Pages
-.claude/      Claude Code agents, commands, and project rules
-```
 
-## Architecture rules
+The runner tests assert semantic behavior instead of raw memory addresses, because addresses vary between executions.
 
-The non-negotiable rules for this codebase live in [`CLAUDE.md`](CLAUDE.md).
-In short: routers never touch the database directly, LLM providers are only
-called through `app/ai/providers`, original files never go into Postgres,
-every schema change ships an Alembic migration, and retrieved source content
-is always treated as untrusted data, never as instructions.
+## Security model
+
+SeePlusPlus executes untrusted C++ code only inside a constrained runner environment. The project includes explicit resource limits and a seccomp policy, and the runner is kept separate from application/database credentials.
+
+This is still a research/engineering prototype, not a general-purpose secure online judge. The current hardening baseline is documented in [`docs/threat-model.md`](docs/threat-model.md) and [`docs/IMPLEMENTATION_STATUS.md`](docs/IMPLEMENTATION_STATUS.md).
+
+## Design principles
+
+- show runtime truth instead of inventing values;
+- keep the trace schema independent from the UI layout;
+- separate execution from persistence and presentation;
+- make unsupported behavior explicit;
+- validate features with semantic fixtures and runner conformance tests;
+- preserve enough structure to replace the local runner with ECS, Lambda, microVMs, or another tracer without redesigning the frontend trace model.
 
 ## License
 
