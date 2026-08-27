@@ -12,7 +12,12 @@ export default defineConfig({
         manualChunks(id) {
           if (id.includes("@codemirror") || id.includes("@uiw/react-codemirror")) return "editor";
           if (id.includes("@dagrejs")) return "graph";
-          if (id.includes("node_modules/react") || id.includes("lucide-react") || id.includes("zustand")) return "ui";
+          if (
+            id.includes("node_modules/react") ||
+            id.includes("lucide-react") ||
+            id.includes("zustand")
+          )
+            return "ui";
           return undefined;
         },
       },

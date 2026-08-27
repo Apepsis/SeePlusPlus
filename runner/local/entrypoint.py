@@ -68,6 +68,7 @@ def run():
     compile_result = subprocess.run(
         ["g++", *flags, str(SOURCE), "/opt/seeplusplus/trace_alloc.cpp", "-o", str(PROGRAM)],
         capture_output=True, text=True, timeout=max(timeout_ms / 1000, 5), check=False,
+        cwd=WORK,
     )
     compile_ms = int((time.monotonic() - compile_started) * 1000)
     compiler_version = subprocess.run(["g++", "-dumpfullversion"], capture_output=True, text=True, check=False).stdout.strip()
@@ -97,6 +98,7 @@ def run():
             ["gdb", "-q", "-batch", "-nx", "-x", "/opt/seeplusplus/gdb_trace.py", "--args", str(PROGRAM)],
             capture_output=True, text=True, env=environment,
             timeout=timeout_ms / 1000, check=False, start_new_session=True,
+            cwd=WORK,
         )
     except subprocess.TimeoutExpired:
         terminal_kind = "timeout"

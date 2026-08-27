@@ -100,7 +100,8 @@ pnpm --filter @seeplusplus/web preview
 
 The `pages.yml` workflow builds the web app with `VITE_DEMO_MODE=true` and the
 repository base path. In repository settings, choose **Settings → Pages → Build
-and deployment → Source: GitHub Actions**. The resulting URL is:
+and deployment → Source: GitHub Actions**. Then open **Actions → Deploy static
+visualizer to Pages → Run workflow**. The resulting URL is:
 
 `https://apepsis.github.io/SeePlusPlus/`
 
