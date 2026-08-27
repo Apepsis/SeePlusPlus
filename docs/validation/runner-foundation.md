@@ -11,6 +11,8 @@ Completed without Docker:
   the authoring environment's ptrace wrapper.
 - `readelf` confirmed a `DW_TAG_compile_unit` in the binary.
 
-The real GDB trace and hostile-container suites require Docker/GDB. Docker was
-not available in this authoring environment, so `scripts/runner-smoke.sh` and
-`scripts/security-smoke.sh` are mandatory CI gates rather than recorded passes.
+Docker was not available in the authoring container, so the real suites ran in
+GitHub Actions. Run `33031981048` passed both `Golden runtime smoke` and
+`Adversarial containment smoke` on Ubuntu 24.04. The golden run observed nested
+function frames and a real allocation event. The adversarial run contained an
+infinite loop and confirmed blocked network and protected-file access.

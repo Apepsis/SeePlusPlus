@@ -1,5 +1,7 @@
 # SeePlusPlus
 
+[![CI](https://github.com/Apepsis/SeePlusPlus/actions/workflows/ci.yml/badge.svg)](https://github.com/Apepsis/SeePlusPlus/actions/workflows/ci.yml)
+
 SeePlusPlus turns **observed C++ execution** into a synchronized view of source
 lines, stack frames, variables, heap allocations, pointer edges, object
 lifetimes, console output and memory-safety findings.
@@ -139,7 +141,8 @@ suite after every toolchain change. See [threat model](docs/threat-model.md).
 ## Project status
 
 The local real-execution MVP, static Pages demo, schema, analyzers, graph engine,
-persistence migration, cache, CI and security harness are implemented. AWS
+persistence migration, cache, CI and security harness are implemented, and the
+real-runner plus adversarial suites pass in GitHub Actions. AWS
 resources are an infrastructure blueprint and are not deployed by this repo;
 deployment requires the owner's AWS account, domain, images and OIDC role.
 Exact evidence and remaining limits are tracked in
