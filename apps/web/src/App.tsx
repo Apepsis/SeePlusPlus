@@ -14,9 +14,7 @@ export function App() {
     <main className="app-shell">
       <header className="topbar">
         <a className="brand" href="./">
-          <span className="brand-mark">
-            C<span>++</span>
-          </span>
+          <span className="brand-mark">C<span>++</span></span>
           <div>
             <strong>SeePlusPlus</strong>
             <small>runtime, made visible</small>
@@ -38,9 +36,7 @@ export function App() {
           <BookOpen size={16} />
           <label htmlFor="example">Example</label>
           <select id="example" value={state.selectedExample} onChange={(event) => state.selectExample(event.target.value)}>
-            {examples.map((example) => (
-              <option value={example.slug} key={example.slug}>{example.title}</option>
-            ))}
+            {examples.map((example) => <option value={example.slug} key={example.slug}>{example.title}</option>)}
           </select>
         </div>
         <div className="run-context">
@@ -57,11 +53,11 @@ export function App() {
       </section>
 
       {state.trace && step ? (
-        <div className="runtime-summary panel">
+        <div className="runtime-summary panel" aria-label="Runtime execution summary">
           <Activity size={16} />
-          <span>Step {state.stepIndex + 1}/{state.trace.steps.length}</span>
-          <span>{step.location?.function ?? "main"}</span>
-          <span>{state.findings.length} findings</span>
+          <span><strong>Step:</strong> {state.stepIndex + 1}/{state.trace.steps.length}</span>
+          <span><strong>Function:</strong> {step.location?.function ?? "main"}</span>
+          <span><strong>Issues:</strong> {state.findings.length}</span>
         </div>
       ) : null}
 
@@ -70,9 +66,7 @@ export function App() {
       <div className="workspace-grid">
         <CodePane code={state.code} activeLine={step?.location?.line} onChange={state.setCode} />
         {state.trace && step ? <RuntimePane trace={state.trace} step={step} /> : (
-          <section className="runtime-pane panel empty-state">
-            Run a program to inspect its runtime state.
-          </section>
+          <section className="runtime-pane panel empty-state">Run a program to inspect its runtime state.</section>
         )}
       </div>
       {step ? <ConsolePanel step={step} findings={state.findings} onJump={state.setStep} /> : null}
