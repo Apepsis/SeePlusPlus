@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { BookOpen, Github, LoaderCircle, Play, RotateCcw, ShieldCheck, Activity } from "lucide-react";
 import { examples } from "@seeplusplus/test-fixtures";
 import { CodePane } from "./components/CodePane.js";
@@ -9,6 +10,18 @@ import { demoMode, useAppStore } from "./store.js";
 export function App() {
   const state = useAppStore();
   const step = state.trace?.steps[state.stepIndex];
+
+  useEffect(() => {
+    const handleShortcut = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
+        event.preventDefault();
+        if (state.status !== "running") void state.run();
+      }
+    };
+
+    window.addEventListener("keydown", handleShortcut);
+    return () => window.removeEventListener("keydown", handleShortcut);
+  }, [state]);
 
   return (
     <main className="app-shell">
